@@ -1,5 +1,5 @@
-CC=gcc
-CFLAGS=-fstack-protector -fsanitize=address
+CC=time gcc
+CFLAGS=-fstack-protector -fsanitize=address -Wall
 LDFLAGS=
 EXEC_PARSER = outputs/parser_test
 EXEC_TOKENIZER = outputs/tokenizer_test
