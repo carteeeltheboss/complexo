@@ -22,7 +22,7 @@ typedef struct {
 
 Token *create_token(TokenType type, const char *value);
 void free_token(Token *token);
-
+Token **tokenize(const char *code, int *token_count);
 
 
 
