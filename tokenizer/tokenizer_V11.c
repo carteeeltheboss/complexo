@@ -1,34 +1,13 @@
 #include "tokenizer.h"
 
-
-Token *create_token(TokenType type, const char *value) {
-    Token *token = malloc(sizeof(Token));
-    if (token == NULL) {
-        fprintf(stderr, "Memory allocation failed!\n");
-        exit(1); 
-    }
-    token->type = type;
-    token->value = strdup(value); 
-    if (token->value == NULL) {
-        fprintf(stderr, "Memory allocation failed!\n");
-        exit(1); 
-    }
-    return token;
-}
-
-void free_token(Token *token) {
-    free(token->value);
-    free(token);
-}
-
-// Helper function to check if a string is a keyword
-int is_keyword(const char *str) {
-    const char *keywords[] = {
-        "and", "as", "assert", "break", "class", "continue", "def", "del", 
-        "elif", "else", "except", "False", "finally", "for", "from", "global", 
-        "if", "import", "in", "is", "lambda", "None", "nonlocal", "not", "or", 
-        "pass", "raise", "return", "True", "try", "while", "with", "yield"
-    };
+// Helper function to check if a string is a Python keyword
+int is_keyword(const char* str) {
+    const char* keywords[] = {
+        "and",  "as",       "assert", "break",  "class", "continue", "def",
+        "del",  "elif",     "else",   "except", "False", "finally",  "for",
+        "from", "global",   "if",     "import", "in",    "is",       "lambda",
+        "None", "nonlocal", "not",    "or",     "pass",  "raise",    "return",
+        "True", "try",      "while",  "with",   "yield"};
     int num_keywords = sizeof(keywords) / sizeof(keywords[0]);
     for (int i = 0; i < num_keywords; i++) {
         if (strcmp(str, keywords[i]) == 0) {
@@ -38,127 +17,150 @@ int is_keyword(const char *str) {
     return 0;
 }
 
-Token **tokenize(const char *code, int *token_count) {
-    const char *ptr = code;
-    Token **tokens = NULL;
+// Create a token
+Token* create_token(TokenType type, const char* value) {
+    Token* token = malloc(sizeof(Token));
+    if (!token) {
+        fprintf(stderr, "Memory allocation failed for token\n");
+        exit(1);
+    }
+    token->type = type;
+    token->value = strdup(value);
+    if (!token->value) {
+        fprintf(stderr, "Memory allocation failed for token value\n");
+        exit(1);
+    }
+    return token;
+}
+
+// Free a token
+void free_token(Token* token) {
+    if (token) {
+        free(token->value);
+        free(token);
+    }
+}
+
+// Tokenize Python code
+Token** tokenize(const char* code, int* token_count) {
+    const char* ptr = code;
+    Token** tokens = NULL;
     *token_count = 0;
-    int indent_level = 0; 
-    int current_line_indent = 0;
+    int indent_level = 0;
+    int current_indent = 0;
 
     while (*ptr) {
+        // Skip whitespace and track indentation
         if (isspace(*ptr)) {
             if (*ptr == '\n') {
-                tokens = realloc(tokens, sizeof(Token *) * (*token_count + 1));
-                tokens[*token_count] = create_token(TOKEN_NEWLINE, "\n");
+                tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
+                tokens[*token_count] = create_token(TOKEN_NEWLINE, "\\n");
                 (*token_count)++;
-                current_line_indent = 0; 
+                current_indent = 0;
             } else if (*ptr == ' ') {
-                current_line_indent++;
+                current_indent++;
             } else if (*ptr == '\t') {
-                // Assuming a tab is equivalent to 4 spaces
-                current_line_indent += 4; 
+                current_indent += 4; // Treat tab as 4 spaces
             }
             ptr++;
             continue;
         }
 
-        // Handle indentation
-        if (current_line_indent > indent_level) {
-            tokens = realloc(tokens, sizeof(Token *) * (*token_count + 1));
+        // Handle indentation tokens
+        if (current_indent > indent_level) {
+            tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
             tokens[*token_count] = create_token(TOKEN_INDENT, "INDENT");
             (*token_count)++;
-            indent_level = current_line_indent;
-        } else if (current_line_indent < indent_level) {
-            while (current_line_indent < indent_level) {
-                tokens = realloc(tokens, sizeof(Token *) * (*token_count + 1));
+            indent_level = current_indent;
+        } else if (current_indent < indent_level) {
+            while (current_indent < indent_level) {
+                tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
                 tokens[*token_count] = create_token(TOKEN_DEDENT, "DEDENT");
                 (*token_count)++;
-                indent_level -= 4; // Assuming dedent is in steps of 4 spaces
+                indent_level -= 4;
             }
         }
 
+        // Handle numbers
         if (isdigit(*ptr)) {
-            const char *start = ptr;
-            while (isdigit(*ptr) || *ptr == '.') { // Allow for decimal points
+            const char* start = ptr;
+            while (isdigit(*ptr) || *ptr == '.')
                 ptr++;
-            }
-            char *value = strndup(start, ptr - start);
-            tokens = realloc(tokens, sizeof(Token *) * (*token_count + 1));
+            char* value = strndup(start, ptr - start);
+            tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
             tokens[*token_count] = create_token(TOKEN_NUMBER, value);
             (*token_count)++;
             free(value);
-        } else if (isalpha(*ptr) || *ptr == '_') { 
-            const char *start = ptr;
-            while (isalnum(*ptr) || *ptr == '_') {
+            continue;
+        }
+
+        // Handle identifiers and keywords
+        if (isalpha(*ptr) || *ptr == '_') {
+            const char* start = ptr;
+            while (isalnum(*ptr) || *ptr == '_')
                 ptr++;
-            }
-            char *value = strndup(start, ptr - start);
-            TokenType type = is_keyword(value) ? TOKEN_KEYWORD : TOKEN_IDENTIFIER;
-            tokens = realloc(tokens, sizeof(Token *) * (*token_count + 1));
+            char* value = strndup(start, ptr - start);
+            TokenType type =
+                is_keyword(value) ? TOKEN_KEYWORD : TOKEN_IDENTIFIER;
+            tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
             tokens[*token_count] = create_token(type, value);
             (*token_count)++;
             free(value);
-        } else if (*ptr == '"' || *ptr == '\'') {
-            char quote = *ptr;
-            const char *start = ptr;
-            ptr++; 
+            continue;
+        }
 
-            while (*ptr && *ptr != quote) {
-                if (*ptr == '\\') {
-                    ptr++; 
-                    if (*ptr == '\0') {
-                        fprintf(stderr, "Error: Unterminated string literal\n");
-                        exit(1);
-                    }
-                }
+        // Handle operators and punctuation
+        if (strchr("+-*/=<>!%&|^~:,.()[]{}", *ptr)) {
+            const char* start = ptr++;
+            char* value = strndup(start, 1); // Single character token
+            tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
+            tokens[*token_count] = create_token(TOKEN_OPERATOR, value);
+            (*token_count)++;
+            free(value);
+            continue;
+        }
+
+        // Skip comments
+        if (*ptr == '#') {
+            while (*ptr && *ptr != '\n')
                 ptr++;
+            continue;
+        }
+
+        // Handle string literals
+        if (*ptr == '"' || *ptr == '\'') {
+            char quote_char =
+                *ptr++; // Store the type of quote (single or double)
+            const char* start = ptr;
+
+            while (*ptr && *ptr != quote_char) {
+                if (*ptr == '\\' && *(ptr + 1)) {
+                    ptr += 2; // Skip escaped characters
+                } else {
+                    ptr++;
+                }
             }
 
-            if (*ptr == quote) {
-                ptr++; 
-            } else {
+            if (*ptr != quote_char) {
                 fprintf(stderr, "Error: Unterminated string literal\n");
                 exit(1);
             }
 
-            char *value = strndup(start, ptr - start);
-            tokens = realloc(tokens, sizeof(Token *) * (*token_count + 1));
+            // Create a string token
+            char* value = strndup(start, ptr - start);
+            tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
             tokens[*token_count] = create_token(TOKEN_STRING, value);
             (*token_count)++;
             free(value);
-        } else if (strchr("+-*/=<>!%&|^~:,.()[]{}", *ptr) != NULL) { 
-            const char *start = ptr;
-            // Handle combined operators (e.g., ==, +=, **, //)
-            while (strchr("+-*/=<>!%&|^~:", *ptr) != NULL) { 
-                ptr++;
-            }
-            char *value = strndup(start, ptr - start);
-            tokens = realloc(tokens, sizeof(Token *) * (*token_count + 1));
-            tokens[*token_count] = create_token(TOKEN_OPERATOR, value);
-            (*token_count)++;
-            free(value);
-        } else if (*ptr == '#') { // Handle single-line comments
-            while (*ptr && *ptr != '\n') {
-                ptr++;
-            }
-        } else {
-            // Handle unknown characters or errors here
-            fprintf(stderr, "Error: Unrecognized character '%c'\n", *ptr);
-            exit(1); 
+
+            ptr++; // Move past the closing quote
+            continue;
         }
     }
 
-    // Handle dedents at the end of the code
-    while (indent_level > 0) {
-        tokens = realloc(tokens, sizeof(Token *) * (*token_count + 1));
-        tokens[*token_count] = create_token(TOKEN_DEDENT, "DEDENT");
-        (*token_count)++;
-        indent_level -= 4; 
-    }
-
-    tokens = realloc(tokens, sizeof(Token *) * (*token_count + 1));
+    // Add EOF token
+    tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
     tokens[*token_count] = create_token(TOKEN_EOF, "EOF");
     (*token_count)++;
-
     return tokens;
 }

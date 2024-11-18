@@ -1,29 +1,27 @@
 #include "tokenizer.h"
 
 int main() {
-    const char *code = 
+    const char *code =
         "def my_function(a, b):\n"
         "    \"\"\"This is a docstring.\"\"\"\n"
         "    if a > b:\n"
-        "        return a * b + 10  # This is a comment\n"
+        "        return a * b + 10  # Comment\n"
         "    else:\n"
         "        return a / b - 10\n"
-        "\n"
         "print(my_function(5, 2))";
-
+    const char *code1 = "for i in range(10): print(i)";
     int token_count = 0;
-    Token **tokens = tokenize(code, &token_count);
+    Token **tokens = tokenize(code1, &token_count);
 
     printf("Token Count: %d\n", token_count);
     for (int i = 0; i < token_count; i++) {
         printf("Token %d: Type = %d, Value = '%s'\n", i, tokens[i]->type, tokens[i]->value);
-        free_token(tokens[i]); 
+        free_token(tokens[i]);
     }
-    free(tokens); 
+    free(tokens);
 
     return 0;
 }
-
 
 
 
