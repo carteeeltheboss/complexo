@@ -1,7 +1,7 @@
 #include "tokenizer.h" 
 
 int main() {
-    const char *code = "for for for for k: while j++";
+    const char *code = "for i in range(10): print(i)";
     int token_count = 0;
 
     Token **tokens = tokenize(code, &token_count);

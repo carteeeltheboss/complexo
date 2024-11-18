@@ -34,16 +34,17 @@ void free_ast(ASTNode *node){
 //?? to revise !
 
 ASTNode *parse_syntax(Token **tokens, int *index){
-	Token *current = token[*index];
+	Token *current = tokens[*index];
 	if(current->type == TOKEN_KEYWORD && strcmp(current->value, "for") == 0){
 		return parse_for_loop(tokens,index);
 	}
+	return NULL;
 }
 
 
 ASTNode *parse_exp(Token **tokens, int *index){
 	Token *current = tokens[*index];
-	if(current->type == TOKEN_IDENTIFIER || current->type = TOKEN_NUMBER){
+	if(current->type == TOKEN_IDENTIFIER || current->type == TOKEN_NUMBER){
 		(*index)++;
 		return create_ast_node("EXPRESSION", current->value);
 	}
@@ -73,6 +74,7 @@ ASTNode *parse_for_loop(Token **tokens, int *index){
 			(*index)++;
 		}else{
 			printf("Syntax error: Expected 'in' after variable %s.\n", tokens[(*index)-1]->value);
+			//printf("Received: %s, strcmp(current->value, 'in')= %d\n", current->value, strcmp(current->value, "in"));
 			free_ast(node);
 			node = NULL;
 			return NULL;

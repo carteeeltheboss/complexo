@@ -22,5 +22,5 @@ int main() {
     }
     free(tokens);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
