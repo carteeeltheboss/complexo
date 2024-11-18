@@ -40,7 +40,7 @@ Token **tokenize(const char *code, int *token_count){
 			char *value = strndup(start, ptr-start);
 
 			TokenType type = TOKEN_IDENTIFIER;
-			if(strcmp(value, "def")*strcmp(value, "while")*strcmp(value, "if")*strcmp(value, "for") == 0){
+			if(strcmp(value, "in")*strcmp(value, "def")*strcmp(value, "while")*strcmp(value, "if")*strcmp(value, "for") == 0){
 				type = TOKEN_KEYWORD;
 			}
 

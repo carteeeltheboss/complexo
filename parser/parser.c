@@ -97,6 +97,7 @@ ASTNode *parse_for_loop(Token **tokens, int *index){
 			(*index)++;
 		} else {
 			printf("Syntax error: Expected ':' after iterable.\n");
+			printf("Received: %s, strcmp(current->value, ':')= %d\n", current->value, strcmp(current->value, ":"));
 			free_ast(node);
 			return NULL;
 		}
