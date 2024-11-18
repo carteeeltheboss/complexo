@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <ctype.h>
 #define EXIT_SUCCESS 0
 
 typedef enum {

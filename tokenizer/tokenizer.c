@@ -51,8 +51,8 @@ Token **tokenize(const char *code, int *token_count){
 			value = NULL;
 		}else{
 			char value[2]={*ptr, '\0'};
-			tokens = realloc(tokens, sizeof(Token *), (*token_count+1));
-			tokens[*token_count]=create_token(TOKEN_PONCTUATION, value);
+			tokens = realloc(tokens, sizeof(Token *)*(*token_count+1));
+			tokens[*token_count]=create_token(TOKEN_PUNCTUATION, value);
 			(*token_count)++;
 			ptr++;
 		}
