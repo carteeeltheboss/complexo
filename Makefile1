@@ -1,0 +1,56 @@
+CC=gcc
+t_CC=time gcc
+CFLAGS=-fstack-protector -fsanitize=address
+LDFLAGS=
+SRCS_PARSER := parser/parser.c parser/parser.h
+SRCS_TOKENIZER := tokenizer/tokenizer.c tokenizer/tokenizer.h tokenizer/tokenizer_test.c
+#SRCS_++++ :=
+
+OBJS := $(SRCS:.c=.o)
+EXEC := complexo
+EXEC_tok := complexo_tok
+EXEC_pars := complexo_pars
+
+all: $(EXEC) $(SRCS)
+	@rm -f $(EXEC)
+	@echo '[-] Deleted Previous Executable.'
+	@echo '[+] Compiling Program.'
+	@echo '[++++++++++++++++++++++++++++++++++++++++++]'
+	#@touch .kios
+	@$(CC) $(CFLAGS) -o $(EXEC) 2>&1 #| tee .kids
+	#@$(CC) $(CFLAGS) $(SRCS) $(LDFLAGS) -o $(EXEC) 2>&1 #| tee .kids
+	@echo '[++++++++++++++++++++++++++++++++++++++++++]'
+	@echo '[+] Program Compiled Successfuly.'
+
+	@echo '[x] Launching Program....'
+	@./$(EXEC)
+	@echo '[-] Program Instance terminated....'
+	#@rm -f .kids
+
+tokenizer: $(EXEC_tok) $(SRCS_TOKENIZER)
+	@rm -f $(EXEC_tok)
+	@echo '[-] Deleted Previous Tokenizer.'
+	@echo '[+] Compiling Program.'
+	@echo '[++++++++++++++++++++++++++++++++++++++++++]'
+	#@touch .kios
+	@$(CC) $(CFLAGS) -o $(EXEC_tok) #2>&1 | tee .kids
+	#@$(CC) $(CFLAGS) $(SRCS) $(LDFLAGS) -o $(EXEC) 2>&1 #| tee .kids
+	@echo '[++++++++++++++++++++++++++++++++++++++++++]'
+	@echo '[+] Tokenizer Compiled Successfuly.'
+
+	@echo '[x] Launching Tokenizer....'
+	@./$(EXEC_tok)
+	@echo '[-] Tokenizer Instance terminated....'
+	#@rm -f .kids
+
+#$(EXEC): $(SRCS)
+#	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+#$(EXEC_tok): $(SRCS_TOKENIZER)
+#	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+clean:
+	rm -f $(EXEC)
+#work in progress :'( didnt work so i didnt give it much importance
+	#@cat .kios | grep -oP '\d+(?=\s*user)' | tee .kios
+	#@echo 'Compilation time: 0.'"$(duration)"'sec'
