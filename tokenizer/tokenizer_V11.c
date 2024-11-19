@@ -58,7 +58,7 @@ Token** tokenize(const char* code, int* token_count) {
                 (*token_count)++;
                 current_indent = 0;
             } else if (*ptr == ' ') {
-                current_indent++;
+                //current_indent++;
             } else if (*ptr == '\t') {
                 current_indent += 4; // Treat tab as 4 spaces
             }
