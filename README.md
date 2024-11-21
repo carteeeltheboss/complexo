@@ -39,7 +39,7 @@ Before installing and running **Complexo**, ensure you have the following prereq
     - **Windows**: idk use CMake or Wingcc
     - **macOS**: You need to have brew installed first.
         ```bash
-        brew install sdl2 sdl2_image sdl2_mixer sdl2_ttf
+        brew install gcc make autoconf automake libtool
         ```
     - **Linux**: 
         ```bash
@@ -109,8 +109,8 @@ I would like to express my sincere gratitude to the following individuals and or
 
 Special thanks to the following resources and inspirations that played a significant role in the project's design and development:
 
-- Regex: where if you had a problem and tried to use it, you get 2 problems
-- (not chatgpt at all)): For helping in debugging and bug tracability.
+- Regex: where if you had a problem and tried to use it, you have then 2 problems
+- (not chatgpt at all): For helping in debugging and bug tracability.
 - [Contributors]: For their valuable contributions, whether it be through code, suggestions, or testing.
 
 
