@@ -109,8 +109,20 @@ Token** tokenize(const char* code, int* token_count) {
             continue;
         }
 
-        // Handle operators and punctuation
+                // Handle operators and punctuation
         if (strchr("+-*/=<>!%&|^~:,.()[]{}", *ptr)) {
+            const char* start = ptr++;
+            char* value = strndup(start, 1); // Single character token
+            tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
+            tokens[*token_count] = create_token(TOKEN_PUNCTUATION, value);
+            (*token_count)++;
+            free(value);
+            continue;
+        }
+
+        /*
+         Handle operators and punctuation
+        if (strchr("+-/*=<>!%&|^~:,.()[]{}", *ptr)) {
             const char* start = ptr++;
             char* value = strndup(start, 1); // Single character token
             tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
@@ -119,43 +131,112 @@ Token** tokenize(const char* code, int* token_count) {
             free(value);
             continue;
         }
-
+        */
         // Skip comments
-        if (*ptr == '#') {
-            while (*ptr && *ptr != '\n')
-                ptr++;
-            continue;
+     /*(   if (*ptr == '#') {
+                 while (*ptr && *ptr != '\n')
+                     ptr++;
+                 continue;
+             }
+     
+             // Handle string literals
+             if (*ptr == '"' || *ptr == '\'') {
+                 char quote_char =
+                     *ptr++; // Store the type of quote (single or double)
+                 const char* start = ptr;
+     
+                 while (*ptr && *ptr != quote_char) {
+                     if (*ptr == '\\' && *(ptr + 1)) {
+                         ptr += 2; // Skip escaped characters
+                     } else {
+                         ptr++;
+                     }
+                 }
+     
+                 if (*ptr != quote_char) {
+                     fprintf(stderr, "Error: Unterminated string literal\n");
+                     exit(1);
+                 }
+     
+                 // Create a string token
+                 char* value = strndup(start, ptr - start);
+                 tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
+                 tokens[*token_count] = create_token(TOKEN_STRING, value);
+                 (*token_count)++;
+                 free(value);
+     
+                 ptr++; // Move past the closing quote
+                 continue;
+             })*/
+
+        // Handle comments (single-line)
+if (*ptr == '#') {
+    while (*ptr && *ptr != '\n') 
+        ptr++;
+    continue;
+}
+
+
+if (*ptr == '"' || *ptr == '\'') {
+    char quote_char = *ptr++;  
+    const char *start = ptr;
+
+     
+    while (*ptr && *ptr != quote_char) {
+        if (*ptr == '\\' && *(ptr + 1)) {
+            ptr += 2; 
+        } else {
+            ptr++;
         }
+    }
 
-        // Handle string literals
-        if (*ptr == '"' || *ptr == '\'') {
-            char quote_char =
-                *ptr++; // Store the type of quote (single or double)
-            const char* start = ptr;
+    if (*ptr != quote_char) {
+        fprintf(stderr, "Error: Unterminated string literal\n");
+        exit(1);
+    }
 
-            while (*ptr && *ptr != quote_char) {
-                if (*ptr == '\\' && *(ptr + 1)) {
-                    ptr += 2; // Skip escaped characters
-                } else {
-                    ptr++;
-                }
-            }
+   
+    char *value = strndup(start, ptr - start);
+    tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
+    tokens[*token_count] = create_token(TOKEN_STRING, value);
+    (*token_count)++;
+    free(value);
 
-            if (*ptr != quote_char) {
-                fprintf(stderr, "Error: Unterminated string literal\n");
-                exit(1);
-            }
+    ptr++; 
+    continue;
+}
+if ((*ptr == '"' && *(ptr + 1) == '"') || (*ptr == '\'' && *(ptr + 1) == '\'')) {
+    char quote_char = *ptr;  
+    ptr += 3; 
 
-            // Create a string token
-            char* value = strndup(start, ptr - start);
-            tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
-            tokens[*token_count] = create_token(TOKEN_STRING, value);
-            (*token_count)++;
-            free(value);
-
-            ptr++; // Move past the closing quote
-            continue;
+    const char *start = ptr;
+    
+    while (*ptr && !(*ptr == quote_char && *(ptr + 1) == quote_char && *(ptr + 2) == quote_char)) {
+        if (*ptr == '\\' && *(ptr + 1)) {
+            ptr += 2;  
+        } else {
+            ptr++;
         }
+    }
+
+    if (!(*ptr && *(ptr + 1) == quote_char && *(ptr + 2) == quote_char)) {
+        fprintf(stderr, "Error: Unterminated docstring\n");
+        exit(1);
+    }
+
+    ptr += 3;
+
+    char *value = strndup(start, ptr - start - 3);  
+    tokens = realloc(tokens, sizeof(Token*) * (*token_count + 1));
+    tokens[*token_count] = create_token(TOKEN_DOCSTRING, value);
+    (*token_count)++;
+    free(value);
+
+    continue;
+}
+
+
+
     }
 
     // Add EOF token

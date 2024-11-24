@@ -12,6 +12,7 @@ typedef enum {
     TOKEN_KEYWORD,
     TOKEN_NUMBER,
     TOKEN_OPERATOR,
+    TOKEN_DOCSTRING,
     TOKEN_STRING,
     TOKEN_PUNCTUATION,
     TOKEN_INDENT,
@@ -28,6 +29,6 @@ typedef struct {
 Token *create_token(TokenType type, const char *value);
 void free_token(Token *token);
 Token **tokenize(const char *code, int *token_count);
-
+const char *token_type_to_string(TokenType type);
 
 #endif

@@ -3,7 +3,7 @@ CFLAGS=-fstack-protector -fsanitize=address -Wall
 LDFLAGS=
 EXEC_PARSER = outputs/parser_test
 EXEC_TOKENIZER = outputs/tokenizer_test
-SRCS_PARSER = parser/parser.c tokenizer/tokenizer_V11.c parser/parser_test.c 
+SRCS_PARSER = parser/parser_1.c tokenizer/tokenizer_V11.c parser/parser_test.c hasher/hasher.c
 SRCS_TOKENIZER = tokenizer/tokenizer_V11.c tokenizer/tokenizer_test.c
 
 
