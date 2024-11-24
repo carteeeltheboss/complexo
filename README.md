@@ -15,7 +15,7 @@
 
 ## Introduction
 **Complexo**, is a C-based program that analyses a input that's supposedly python program and returns the estimate complexity of that program.
-
+Note that output are compiled for macos using gcc for darwin.
 ## Features
 - **nothing yet tbh**: smol program.
 
